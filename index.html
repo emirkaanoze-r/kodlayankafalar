@@ -997,7 +997,7 @@ function openAdmin() {
 function doLogin() {
   const u = document.getElementById('loginUser').value;
   const p = document.getElementById('loginPass').value;
-  if(u==='admin' && p==='admin123') {
+  if(u==='admin' && p==='admin1234') {
     document.getElementById('adminLogin').classList.remove('open');
     document.getElementById('adminPanel').style.display='block';
     document.getElementById('adminDate').textContent = new Date().toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
