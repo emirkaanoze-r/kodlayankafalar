@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kodlayan Kafalar — Yazılım Çözümleri</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#08080e;--surface:#0f0f1a;--surface2:#161625;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
+  --accent:#00e5a0;--accent2:#6c63ff;--accent3:#ff6b6b;
+  --text:#f0ede8;--muted:rgba(240,237,232,0.45);--muted2:rgba(240,237,232,0.22);
+  --mono:'Space Mono',monospace;--sans:'Syne',sans-serif;--serif:'Instrument Serif',serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:var(--sans)}
+input,textarea,select{font-family:var(--mono)}
+
+/* GLOW BG */
+.bg-glow{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.bg-glow::before{content:'';position:absolute;top:-30%;right:-20%;width:60%;height:70%;background:radial-gradient(ellipse,rgba(0,229,160,0.06) 0%,transparent 65%)}
+.bg-glow::after{content:'';position:absolute;bottom:-30%;left:-15%;width:55%;height:65%;background:radial-gradient(ellipse,rgba(108,99,255,0.06) 0%,transparent 65%)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,14,0.85);backdrop-filter:blur(16px);border-bottom:0.5px solid var(--border)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+.nav-logo-icon{width:32px;height:32px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:#08080e;font-weight:700}
+.nav-logo-text{font-size:15px;font-weight:700;letter-spacing:-0.3px}
+.nav-logo-text span{color:var(--accent)}
+.nav-links{display:flex;align-items:center;gap:2rem}
+.nav-links a{font-size:13px;color:var(--muted);transition:color 0.2s;font-weight:600;letter-spacing:0.3px}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-cta{padding:8px 18px;border-radius:7px;background:var(--accent);color:#08080e;font-size:13px;font-weight:700;border:none;transition:opacity 0.2s}
+.nav-cta:hover{opacity:0.85}
+.nav-mobile-btn{display:none;background:none;border:none;color:var(--text);font-size:20px}
+
+/* PAGES */
+.page{display:none;min-height:100vh;padding-top:64px;position:relative;z-index:1}
+.page.active{display:block}
+
+/* ===== HOME PAGE ===== */
+.hero{max-width:1200px;margin:0 auto;padding:6rem 2rem 4rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;border:0.5px solid rgba(0,229,160,0.3);background:rgba(0,229,160,0.06);font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:0.5px;margin-bottom:2rem}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero h1{font-size:clamp(2.5rem,5vw,4.5rem);font-weight:800;line-height:1.02;letter-spacing:-2px;margin-bottom:1.5rem}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p{font-size:1.05rem;color:var(--muted);line-height:1.75;margin-bottom:2.5rem;max-width:460px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn-primary{padding:13px 26px;border-radius:9px;background:var(--accent);color:#08080e;font-size:14px;font-weight:700;border:none;transition:opacity 0.2s,transform 0.1s}
+.btn-primary:hover{opacity:0.87}
+.btn-primary:active{transform:scale(0.97)}
+.btn-secondary{padding:13px 26px;border-radius:9px;background:transparent;color:var(--text);font-size:14px;font-weight:700;border:0.5px solid var(--border2);transition:background 0.2s}
+.btn-secondary:hover{background:var(--surface)}
+
+.hero-visual{position:relative}
+.code-window{background:var(--surface);border:0.5px solid var(--border2);border-radius:14px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.4)}
+.code-win-bar{padding:12px 16px;background:var(--surface2);border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:8px}
+.dot{width:11px;height:11px;border-radius:50%}
+.dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+.code-win-title{flex:1;text-align:center;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.code-body{padding:1.5rem;font-family:var(--mono);font-size:13px;line-height:1.8}
+.c-comment{color:#6a737d}.c-key{color:#6c63ff}.c-str{color:#00e5a0}.c-fn{color:#ff6b6b}.c-num{color:#ffb432}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:0.5px solid var(--border);border-radius:12px;overflow:hidden;margin-top:1.5rem}
+.stat-item{background:var(--surface);padding:1.2rem;text-align:center}
+.stat-n{font-size:1.8rem;font-weight:800;color:var(--accent);font-family:var(--mono)}
+.stat-l{font-size:11px;color:var(--muted);letter-spacing:0.5px;font-family:var(--mono);margin-top:4px}
+
+/* SECTION COMMON */
+.section{max-width:1200px;margin:0 auto;padding:5rem 2rem}
+.section-label{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:1.2rem}
+.section-label::before{content:'';width:28px;height:1px;background:var(--accent)}
+.section-title{font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-1.5px;margin-bottom:1rem;line-height:1.1}
+.section-sub{color:var(--muted);line-height:1.7;max-width:540px;margin-bottom:3rem}
+
+/* SERVICES */
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--border);border-radius:16px;overflow:hidden}
+.service-card{background:var(--surface);padding:2rem;transition:background 0.2s;position:relative;overflow:hidden}
+.service-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:0;transition:opacity 0.3s}
+.service-card:hover{background:var(--surface2)}.service-card:hover::before{opacity:1}
+.service-icon{width:44px;height:44px;border-radius:10px;margin-bottom:1.2rem;display:flex;align-items:center;justify-content:center}
+.si-green{background:rgba(0,229,160,0.1)}.si-purple{background:rgba(108,99,255,0.12)}.si-red{background:rgba(255,107,107,0.1)}.si-amber{background:rgba(255,180,50,0.1)}.si-blue{background:rgba(50,130,255,0.1)}.si-teal{background:rgba(0,200,180,0.1)}
+.service-title{font-size:16px;font-weight:700;margin-bottom:0.6rem}
+.service-desc{font-size:13px;color:var(--muted);line-height:1.65;font-family:var(--mono)}
+.service-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:1rem}
+.stag{padding:3px 10px;border-radius:100px;font-family:var(--mono);font-size:10px;background:rgba(255,255,255,0.05);color:var(--muted);border:0.5px solid var(--border)}
+
+/* PORTFOLIO / PROJECTS */
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.project-card{background:var(--surface);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;transition:transform 0.25s,border-color 0.25s}
+.project-card:hover{transform:translateY(-4px);border-color:var(--border2)}
+.project-thumb{width:100%;height:180px;object-fit:cover;background:var(--surface2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.project-thumb-bg{width:100%;height:100%;background:linear-gradient(135deg,rgba(108,99,255,0.2),rgba(0,229,160,0.15));display:flex;align-items:center;justify-content:center}
+.project-thumb-icon{font-size:3rem;opacity:0.4}
+.project-video-thumb{width:100%;height:100%;object-fit:cover}
+.project-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;background:rgba(0,0,0,0.6);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.project-body{padding:1.2rem}
+.project-category{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem}
+.project-title{font-size:16px;font-weight:700;margin-bottom:0.5rem}
+.project-desc{font-size:13px;color:var(--muted);line-height:1.6;font-family:var(--mono)}
+.project-footer{padding:0 1.2rem 1.2rem;display:flex;gap:8px}
+.project-tag{padding:4px 10px;border-radius:6px;font-family:var(--mono);font-size:10px;background:rgba(255,255,255,0.05);color:var(--muted2);border:0.5px solid var(--border)}
+
+/* VIDEO SECTION */
+.videos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.video-card{background:var(--surface);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;transition:transform 0.2s}
+.video-card:hover{transform:translateY(-3px)}
+.video-thumb{width:100%;aspect-ratio:16/9;background:var(--surface2);position:relative;overflow:hidden;cursor:pointer}
+.video-thumb iframe{width:100%;height:100%;border:none;display:none}
+.video-thumb-cover{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(108,99,255,0.15),rgba(0,229,160,0.1))}
+.video-thumb-cover img{width:100%;height:100%;object-fit:cover}
+.vplay-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;background:rgba(0,229,160,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform 0.2s,background 0.2s}
+.video-thumb:hover .vplay-btn{transform:translate(-50%,-50%) scale(1.1)}
+.video-body{padding:1rem 1.2rem}
+.video-title{font-size:14px;font-weight:700;margin-bottom:0.4rem}
+.video-meta{font-family:var(--mono);font-size:11px;color:var(--muted)}
+
+/* BLOG */
+.blog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.blog-card{background:var(--surface);border:0.5px solid var(--border);border-radius:14px;padding:1.8rem;transition:transform 0.2s,border-color 0.2s}
+.blog-card:hover{transform:translateY(-3px);border-color:var(--border2)}
+.blog-date{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:0.8rem;letter-spacing:1px}
+.blog-title{font-size:17px;font-weight:700;line-height:1.35;margin-bottom:0.8rem}
+.blog-excerpt{font-size:13px;color:var(--muted);line-height:1.65;font-family:var(--mono)}
+.blog-read{display:inline-flex;align-items:center;gap:6px;margin-top:1.2rem;font-size:12px;color:var(--accent);font-weight:700}
+
+/* CONTACT */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+.contact-info-block{margin-bottom:2rem}
+.contact-info-label{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:0.4rem;letter-spacing:1px}
+.contact-info-value{font-size:15px;font-weight:600;color:var(--accent)}
+.contact-form{background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:2rem}
+.form-group{margin-bottom:1.2rem}
+.form-label{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:6px;letter-spacing:1px}
+.form-input{width:100%;padding:10px 14px;background:var(--bg);border:0.5px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;outline:none;transition:border-color 0.2s}
+.form-input:focus{border-color:rgba(0,229,160,0.5)}
+.form-textarea{resize:vertical;min-height:100px}
+.form-submit{width:100%;padding:12px;border-radius:9px;background:var(--accent);color:#08080e;font-size:14px;font-weight:700;border:none;transition:opacity 0.2s}
+.form-submit:hover{opacity:0.87}
+
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.about-avatar{width:100%;aspect-ratio:1;background:var(--surface2);border-radius:20px;border:0.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:6rem;position:relative;overflow:hidden}
+.about-avatar-inner{position:relative;z-index:1}
+.about-avatar::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,229,160,0.08),rgba(108,99,255,0.08))}
+.about-text h2{font-size:clamp(2rem,3.5vw,2.8rem);font-weight:800;letter-spacing:-1.5px;margin-bottom:1.2rem;line-height:1.1}
+.about-text p{color:var(--muted);line-height:1.8;margin-bottom:1rem;font-size:15px}
+.skills-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:1.5rem}
+.skill-chip{padding:6px 14px;border-radius:8px;font-family:var(--mono);font-size:11px;background:rgba(0,229,160,0.08);color:var(--accent);border:0.5px solid rgba(0,229,160,0.2)}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:2rem;border-left:0.5px solid var(--border2)}
+.tl-item{position:relative;margin-bottom:2rem;padding-left:1.5rem}
+.tl-dot{position:absolute;left:-2.6rem;top:4px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+.tl-year{font-family:var(--mono);font-size:11px;color:var(--accent);margin-bottom:4px}
+.tl-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.tl-desc{font-size:13px;color:var(--muted);line-height:1.6;font-family:var(--mono)}
+
+/* FOOTER */
+footer{background:var(--surface);border-top:0.5px solid var(--border);padding:3rem 0}
+.footer-inner{max-width:1200px;margin:0 auto;padding:0 2rem;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem}
+.footer-brand p{font-size:13px;color:var(--muted);line-height:1.7;margin-top:1rem;max-width:260px;font-family:var(--mono)}
+.footer-col h4{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;font-family:var(--mono)}
+.footer-col a{display:block;font-size:13px;color:var(--muted);margin-bottom:0.6rem;transition:color 0.2s}
+.footer-col a:hover{color:var(--text)}
+.footer-bottom{max-width:1200px;margin:0 auto;padding:1.5rem 2rem 0;border-top:0.5px solid var(--border);margin-top:2rem;display:flex;justify-content:space-between;align-items:center}
+.footer-bottom span{font-family:var(--mono);font-size:11px;color:var(--muted)}
+
+/* ===== ADMIN PANEL ===== */
+#adminPanel{display:none;position:fixed;inset:0;z-index:1000;background:var(--bg)}
+.admin-layout{display:grid;grid-template-columns:240px 1fr;height:100vh}
+.admin-sidebar{background:var(--surface);border-right:0.5px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.admin-logo{padding:1.2rem 1.5rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:10px}
+.admin-logo-icon{width:30px;height:30px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:#08080e;font-weight:700}
+.admin-logo-text{font-size:13px;font-weight:700}
+.admin-logo-text span{color:var(--accent)}
+.admin-nav{padding:1rem 0;flex:1}
+.admin-nav-item{display:flex;align-items:center;gap:10px;padding:10px 1.5rem;font-size:13px;color:var(--muted);transition:background 0.15s,color 0.15s;cursor:pointer;border-left:2px solid transparent}
+.admin-nav-item:hover{background:rgba(255,255,255,0.03);color:var(--text)}
+.admin-nav-item.active{background:rgba(0,229,160,0.06);color:var(--accent);border-left-color:var(--accent)}
+.admin-nav-icon{width:16px;text-align:center;font-size:15px}
+.admin-logout{padding:1rem 1.5rem;border-top:0.5px solid var(--border)}
+.admin-logout button{width:100%;padding:9px;border-radius:7px;background:rgba(255,107,107,0.1);border:0.5px solid rgba(255,107,107,0.2);color:#ff6b6b;font-size:12px;font-weight:700;transition:background 0.2s}
+.admin-logout button:hover{background:rgba(255,107,107,0.18)}
+
+.admin-main{overflow-y:auto;background:var(--bg)}
+.admin-topbar{padding:1.2rem 2rem;border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--bg);position:sticky;top:0;z-index:10}
+.admin-topbar h2{font-size:16px;font-weight:700}
+.admin-topbar-sub{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.admin-content{padding:2rem}
+
+.admin-section{display:none}.admin-section.active{display:block}
+
+/* ADMIN: DASHBOARD */
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:2rem}
+.dash-card{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:1.2rem}
+.dash-card-label{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:0.5rem;letter-spacing:1px}
+.dash-card-num{font-size:2rem;font-weight:800;font-family:var(--mono)}
+.dash-card-num.green{color:var(--accent)}.dash-card-num.purple{color:var(--accent2)}.dash-card-num.red{color:var(--accent3)}.dash-card-num.amber{color:#ffb432}
+
+/* ADMIN: TABLE */
+.admin-table-wrap{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;overflow:hidden}
+.admin-table-header{padding:1rem 1.5rem;border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.admin-table-header h3{font-size:14px;font-weight:700}
+.btn-add{padding:8px 16px;border-radius:7px;background:var(--accent);color:#08080e;font-size:12px;font-weight:700;border:none;transition:opacity 0.2s}
+.btn-add:hover{opacity:0.85}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 1.5rem;text-align:left;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;border-bottom:0.5px solid var(--border);background:rgba(255,255,255,0.02)}
+td{padding:12px 1.5rem;font-size:13px;border-bottom:0.5px solid var(--border)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,0.02)}
+.td-actions{display:flex;gap:8px}
+.btn-edit{padding:5px 12px;border-radius:6px;background:rgba(108,99,255,0.12);border:0.5px solid rgba(108,99,255,0.3);color:var(--accent2);font-size:11px;font-weight:700;transition:background 0.2s}
+.btn-edit:hover{background:rgba(108,99,255,0.2)}
+.btn-del{padding:5px 12px;border-radius:6px;background:rgba(255,107,107,0.08);border:0.5px solid rgba(255,107,107,0.2);color:var(--accent3);font-size:11px;font-weight:700;transition:background 0.2s}
+.btn-del:hover{background:rgba(255,107,107,0.15)}
+.badge{display:inline-block;padding:3px 9px;border-radius:100px;font-family:var(--mono);font-size:10px}
+.badge-green{background:rgba(0,229,160,0.1);color:var(--accent);border:0.5px solid rgba(0,229,160,0.25)}
+.badge-amber{background:rgba(255,180,50,0.1);color:#ffb432;border:0.5px solid rgba(255,180,50,0.25)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:0.5px solid var(--border2);border-radius:16px;width:90%;max-width:560px;max-height:85vh;overflow-y:auto}
+.modal-head{padding:1.5rem;border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{font-size:16px;font-weight:700}
+.modal-close{background:none;border:none;color:var(--muted);font-size:22px;line-height:1;transition:color 0.2s}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:1.5rem}
+.modal-footer{padding:1rem 1.5rem;border-top:0.5px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+.btn-cancel{padding:9px 18px;border-radius:8px;background:transparent;border:0.5px solid var(--border2);color:var(--text);font-size:13px;font-weight:700}
+.btn-save{padding:9px 18px;border-radius:8px;background:var(--accent);color:#08080e;font-size:13px;font-weight:700;border:none;transition:opacity 0.2s}
+.btn-save:hover{opacity:0.85}
+
+/* ADMIN LOGIN */
+#adminLogin{display:none;position:fixed;inset:0;z-index:999;background:var(--bg);align-items:center;justify-content:center}
+#adminLogin.open{display:flex}
+.login-box{background:var(--surface);border:0.5px solid var(--border2);border-radius:16px;padding:2.5rem;width:100%;max-width:380px}
+.login-box h2{font-size:22px;font-weight:800;margin-bottom:0.4rem;letter-spacing:-0.5px}
+.login-box p{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:2rem}
+.login-err{font-family:var(--mono);font-size:11px;color:var(--accent3);margin-top:0.8rem;display:none}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--surface);border:0.5px solid rgba(0,229,160,0.3);border-radius:10px;padding:12px 20px;font-family:var(--mono);font-size:12px;color:var(--accent);z-index:9999;transform:translateY(80px);opacity:0;transition:all 0.35s;max-width:300px}
+.toast.show{transform:none;opacity:1}
+.toast.error{border-color:rgba(255,107,107,0.3);color:var(--accent3)}
+
+/* SETTINGS */
+.settings-grid{display:grid;gap:1.5rem}
+.settings-card{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;overflow:hidden}
+.settings-card-head{padding:1rem 1.5rem;border-bottom:0.5px solid var(--border);font-size:14px;font-weight:700}
+.settings-card-body{padding:1.5rem}
+.settings-row{display:flex;justify-content:space-between;align-items:center;padding:0.7rem 0;border-bottom:0.5px solid var(--border)}
+.settings-row:last-child{border-bottom:none}
+.settings-row-label{font-size:13px;font-weight:600}
+.settings-row-sub{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px}
+.toggle{position:relative;width:40px;height:22px;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;inset:0;background:var(--border2);border-radius:100px;transition:background 0.25s}
+.toggle-slider::before{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform 0.25s}
+.toggle input:checked ~ .toggle-slider{background:var(--accent)}
+.toggle input:checked ~ .toggle-slider::before{transform:translateX(18px)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;padding:4rem 1.5rem 2rem}.about-grid{grid-template-columns:1fr}.contact-grid{grid-template-columns:1fr}.footer-inner{grid-template-columns:1fr 1fr}
+  .admin-layout{grid-template-columns:1fr}.admin-sidebar{display:none}
+  .dash-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .nav-links{display:none}.nav-mobile-btn{display:block}
+  .dash-grid{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr}
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.fade-up{animation:fadeUp 0.7s ease both}
+.delay-1{animation-delay:0.1s}.delay-2{animation-delay:0.2s}.delay-3{animation-delay:0.3s}
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo" onclick="showPage('home')">
+      <div class="nav-logo-icon">&lt;/&gt;</div>
+      <div class="nav-logo-text">kodlayan<span>kafalar</span></div>
+    </div>
+    <div class="nav-links">
+      <a href="#" onclick="showPage('home')" id="nav-home" class="active">Ana Sayfa</a>
+      <a href="#" onclick="showPage('hizmetler')" id="nav-hizmetler">Hizmetler</a>
+      <a href="#" onclick="showPage('projeler')" id="nav-projeler">Projeler</a>
+      <a href="#" onclick="showPage('videolar')" id="nav-videolar">Videolar</a>
+      <a href="#" onclick="showPage('blog')" id="nav-blog">Blog</a>
+      <a href="#" onclick="showPage('hakkimda')" id="nav-hakkimda">Hakkımda</a>
+      <a href="#" onclick="showPage('iletisim')" id="nav-iletisim">İletişim</a>
+    </div>
+    <button class="nav-cta" onclick="showPage('iletisim')">Proje Başlat →</button>
+  </div>
+</nav>
+
+<!-- ===== HOME PAGE ===== -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-left fade-up">
+      <div class="hero-badge"><div class="hero-badge-dot"></div> Yeni projeler için müsait</div>
+      <h1>Kod yazarız,<br><em>çözüm</em> üretiriz,<br>büyürsünüz.</h1>
+      <p>Yazılım dünyasında fikirleri gerçeğe dönüştürüyoruz. Web uygulamalarından otomasyon sistemlerine, SaaS ürünlerinden API entegrasyonlarına — her ölçekte çözüm.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showPage('projeler')">Projelerimizi Gör</button>
+        <button class="btn-secondary" onclick="showPage('iletisim')">Konuşalım</button>
+      </div>
+    </div>
+    <div class="hero-visual fade-up delay-2">
+      <div class="code-window">
+        <div class="code-win-bar">
+          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+          <div class="code-win-title">solution.ts</div>
+        </div>
+        <div class="code-body">
+          <div><span class="c-comment">// Kodlayan Kafalar — her proje bir çözümdür</span></div>
+          <br>
+          <div><span class="c-key">const</span> proje = {</div>
+          <div>&nbsp;&nbsp;musteri: <span class="c-str">"Siz"</span>,</div>
+          <div>&nbsp;&nbsp;hedef: <span class="c-str">"büyümek"</span>,</div>
+          <div>&nbsp;&nbsp;teknoloji: [<span class="c-str">"React"</span>, <span class="c-str">"Node"</span>, <span class="c-str">"AI"</span>],</div>
+          <div>&nbsp;&nbsp;teslim: <span class="c-num">true</span></div>
+          <div>}</div>
+          <br>
+          <div><span class="c-fn">coz</span>(proje).<span class="c-fn">then</span>(sonuc =&gt; {</div>
+          <div>&nbsp;&nbsp;console.<span class="c-fn">log</span>(<span class="c-str">"✓ Başarılı"</span>)</div>
+          <div>})</div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-item"><div class="stat-n" id="statP">0</div><div class="stat-l">Proje</div></div>
+        <div class="stat-item"><div class="stat-n" id="statC">0</div><div class="stat-l">Mutlu Müşteri</div></div>
+        <div class="stat-item"><div class="stat-n" id="statY">0</div><div class="stat-l">Yıl Deneyim</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME: hizmetler kısa -->
+  <div style="background:var(--surface);border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border);padding:3rem 0">
+    <div class="section" style="padding:0 2rem">
+      <div class="section-label">hizmetlerimiz</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--border);border-radius:12px;overflow:hidden;margin-top:1.5rem">
+        <div class="service-card" style="background:var(--bg)">
+          <div class="service-icon si-green"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="6" height="6" rx="1.5" fill="#00e5a0"/><rect x="11" y="3" width="6" height="6" rx="1.5" fill="#00e5a0" opacity="0.5"/><rect x="3" y="11" width="6" height="6" rx="1.5" fill="#00e5a0" opacity="0.5"/><rect x="11" y="11" width="6" height="6" rx="1.5" fill="#00e5a0"/></svg></div>
+          <div class="service-title">Web Uygulamaları</div>
+          <div class="service-desc">Modern, hızlı ve ölçeklenebilir</div>
+        </div>
+        <div class="service-card" style="background:var(--bg)">
+          <div class="service-icon si-purple"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" fill="#6c63ff"/><path d="M3 17c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#6c63ff" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/></svg></div>
+          <div class="service-title">Danışmanlık</div>
+          <div class="service-desc">Teknik liderlik ve mimari</div>
+        </div>
+        <div class="service-card" style="background:var(--bg)">
+          <div class="service-icon si-amber"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l2 5.5 5.5 1-4 4 1 5.5-4.5-2.5L5.5 18l1-5.5-4-4 5.5-1z" fill="#ffb432" opacity="0.9"/></svg></div>
+          <div class="service-title">SaaS Geliştirme</div>
+          <div class="service-desc">Fikirden ürüne hızlı dönüşüm</div>
+        </div>
+        <div class="service-card" style="background:var(--bg)">
+          <div class="service-icon si-blue"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 10h10M10 5l5 5-5 5" stroke="#3282ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+          <div class="service-title">API Entegrasyonu</div>
+          <div class="service-desc">Sistemleri birbirine bağlayın</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:2rem">
+        <button class="btn-secondary" onclick="showPage('hizmetler')">Tüm Hizmetleri Gör →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME: son projeler -->
+  <div class="section">
+    <div class="section-label">öne çıkan projeler</div>
+    <div class="section-title">Yaptıklarımızdan<br>bir kesit</div>
+    <div id="homeProjects" class="projects-grid" style="margin-top:2rem"></div>
+    <div style="text-align:center;margin-top:2.5rem">
+      <button class="btn-secondary" onclick="showPage('projeler')">Tüm Projeleri Gör →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HİZMETLER PAGE ===== -->
+<div id="page-hizmetler" class="page">
+  <div class="section">
+    <div class="section-label">hizmetlerimiz</div>
+    <div class="section-title">Size özel <em style="font-style:italic;color:var(--accent)">yazılım çözümleri</em></div>
+    <div class="section-sub">Her proje farklıdır. İhtiyacınıza göre şekillenen, kaliteden ödün vermeyen yazılım geliştirme hizmetleri.</div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon si-green"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="7" height="7" rx="2" fill="#00e5a0"/><rect x="12" y="3" width="7" height="7" rx="2" fill="#00e5a0" opacity="0.45"/><rect x="3" y="12" width="7" height="7" rx="2" fill="#00e5a0" opacity="0.45"/><rect x="12" y="12" width="7" height="7" rx="2" fill="#00e5a0"/></svg></div>
+        <div class="service-title">Full-Stack Web Geliştirme</div>
+        <div class="service-desc">React, Next.js, Vue ile modern frontend; Node.js, Python, Go ile güçlü backend. Veritabanı tasarımından deployment'a her şey.</div>
+        <div class="service-tags"><span class="stag">React</span><span class="stag">Next.js</span><span class="stag">Node.js</span><span class="stag">PostgreSQL</span></div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon si-purple"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" fill="#6c63ff"/><path d="M3 19c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#6c63ff" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/></svg></div>
+        <div class="service-title">Mobil Uygulama Geliştirme</div>
+        <div class="service-desc">React Native ve Flutter ile iOS & Android'de çalışan cross-platform mobil uygulamalar. Native performans, tek kod tabanı.</div>
+        <div class="service-tags"><span class="stag">React Native</span><span class="stag">Flutter</span><span class="stag">iOS</span><span class="stag">Android</span></div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon si-amber"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 2l2.5 6.5L20 10l-5 4.5 1.5 7L11 18.5 5.5 21.5l1.5-7L2 10l6.5-1.5z" fill="#ffb432" opacity="0.9"/></svg></div>
+        <div class="service-title">SaaS Ürün Geliştirme</div>
+        <div class="service-desc">Fikir aşamasından MVP'ye, MVP'den büyük ölçekli ürüne. Kullanıcı yönetimi, ödeme sistemi, dashboard — hepsi dahil.</div>
+        <div class="service-tags"><span class="stag">MVP</span><span class="stag">Stripe</span><span class="stag">Auth</span><span class="stag">Analytics</span></div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon si-blue"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="9" width="18" height="4" rx="2" fill="#3282ff" opacity="0.5"/><circle cx="7" cy="11" r="2.5" fill="#3282ff"/><circle cx="15" cy="11" r="2.5" fill="#3282ff"/></svg></div>
+        <div class="service-title">API & Sistem Entegrasyonu</div>
+        <div class="service-desc">Farklı sistemleri birbirine bağlayan RESTful ve GraphQL API'lar. Üçüncü taraf servisler, webhook'lar, veri senkronizasyonu.</div>
+        <div class="service-tags"><span class="stag">REST API</span><span class="stag">GraphQL</span><span class="stag">Webhook</span><span class="stag">Microservice</span></div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon si-teal"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 18V8l7-5 7 5v10" stroke="#00c8b4" stroke-width="1.5" stroke-linecap="round" fill="none"/><rect x="8" y="13" width="6" height="5" rx="1" fill="#00c8b4" opacity="0.6"/></svg></div>
+        <div class="service-title">Otomasyon & DevOps</div>
+        <div class="service-desc">CI/CD pipeline kurulumu, Docker, Kubernetes, cloud altyapı yönetimi. İş süreçlerinizi otomatize eden akıllı sistemler.</div>
+        <div class="service-tags"><span class="stag">Docker</span><span class="stag">AWS</span><span class="stag">CI/CD</span><span class="stag">Terraform</span></div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon si-red"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 3v4M11 15v4M3 11h4M15 11h4" stroke="#ff6b6b" stroke-width="1.5" stroke-linecap="round"/><circle cx="11" cy="11" r="3" fill="#ff6b6b" opacity="0.7"/></svg></div>
+        <div class="service-title">Yapay Zeka Entegrasyonu</div>
+        <div class="service-desc">LLM entegrasyonları, chatbot'lar, öneri sistemleri, görüntü işleme. Ürününüze AI gücü katın.</div>
+        <div class="service-tags"><span class="stag">OpenAI</span><span class="stag">LangChain</span><span class="stag">RAG</span><span class="stag">Fine-tune</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROJELER PAGE ===== -->
+<div id="page-projeler" class="page">
+  <div class="section">
+    <div class="section-label">portföy</div>
+    <div class="section-title">Geliştirdiğimiz Projeler</div>
+    <div class="section-sub">Her satır kod bir problemi çözmek için yazıldı. İşte sonuçları.</div>
+    <div id="projectsGrid" class="projects-grid"></div>
+  </div>
+</div>
+
+<!-- ===== VİDEOLAR PAGE ===== -->
+<div id="page-videolar" class="page">
+  <div class="section">
+    <div class="section-label">içerikler</div>
+    <div class="section-title">Video İçerikler</div>
+    <div class="section-sub">Yazılım, kariyer ve girişimcilik üzerine paylaşımlar.</div>
+    <div id="videosGrid" class="videos-grid"></div>
+  </div>
+</div>
+
+<!-- ===== BLOG PAGE ===== -->
+<div id="page-blog" class="page">
+  <div class="section">
+    <div class="section-label">yazılar</div>
+    <div class="section-title">Blog</div>
+    <div class="section-sub">Yazılım, kariyer ve teknoloji dünyasından notlar ve düşünceler.</div>
+    <div id="blogGrid" class="blog-grid"></div>
+  </div>
+</div>
+
+<!-- ===== HAKKIMDA PAGE ===== -->
+<div id="page-hakkimda" class="page">
+  <div class="section">
+    <div class="about-grid">
+      <div>
+        <div class="about-avatar"><div class="about-avatar-inner" style="font-size:5rem">👨‍💻</div></div>
+      </div>
+      <div class="about-text">
+        <div class="section-label">hakkımda</div>
+        <h2>Yazılım seven, çözüm üreten bir mühendis.</h2>
+        <p>Bilgisayar Mühendisliği mezunuyum. Üniversite yıllarından bu yana kod yazmak, sistem tasarlamak ve problemleri yazılımla çözmek benim için bir tutku haline geldi.</p>
+        <p>Kodlayan Kafalar, bu tutkuyu gerçek değere dönüştürme hayalinin somutlaşmış hali. Tek kişilik bir atölyeden, büyüyen bir yazılım firmasına doğru ilerliyoruz.</p>
+        <p>Müşterilerimin projelerine kendi projem gibi yaklaşıyorum — çünkü her başarılı ürün, birinin hayalinin gerçeğe dönüşmesi demek.</p>
+        <div class="skills-list">
+          <span class="skill-chip">JavaScript</span><span class="skill-chip">TypeScript</span><span class="skill-chip">Python</span>
+          <span class="skill-chip">React</span><span class="skill-chip">Node.js</span><span class="skill-chip">PostgreSQL</span>
+          <span class="skill-chip">Docker</span><span class="skill-chip">AWS</span><span class="skill-chip">MongoDB</span>
+          <span class="skill-chip">Git</span><span class="skill-chip">REST API</span><span class="skill-chip">GraphQL</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:5rem">
+      <div class="section-label">deneyim & eğitim</div>
+      <div class="section-title" style="margin-bottom:2rem">Yolculuk</div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2024 — Günümüz</div><div class="tl-title">Kodlayan Kafalar — Kurucu</div><div class="tl-desc">Serbest yazılım geliştirme ve danışmanlık. Web uygulamaları, SaaS ürünleri ve otomasyon projeleri.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2022 — 2024</div><div class="tl-title">Senior Frontend Developer — Teknoloji Firması</div><div class="tl-desc">React ekosistemi, performans optimizasyonu, takım liderliği ve code review.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2020 — 2022</div><div class="tl-title">Full-Stack Developer — Startup</div><div class="tl-desc">Sıfırdan ürün geliştirme deneyimi. Node.js backend, React frontend, AWS altyapısı.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2016 — 2020</div><div class="tl-title">Bilgisayar Mühendisliği Lisans</div><div class="tl-desc">Veri yapıları, algoritmalar, yazılım mühendisliği. Staj ve proje deneyimleri.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== İLETİŞİM PAGE ===== -->
+<div id="page-iletisim" class="page">
+  <div class="section">
+    <div class="section-label">iletişim</div>
+    <div class="section-title">Bir projeniz mi var?<br><em style="font-style:italic;color:var(--accent)">Konuşalım.</em></div>
+    <div class="contact-grid" style="margin-top:3rem">
+      <div>
+        <div class="contact-info-block">
+          <div class="contact-info-label">E-POSTA</div>
+          <div class="contact-info-value">merhaba@kodlayankafalar.com</div>
+        </div>
+        <div class="contact-info-block">
+          <div class="contact-info-label">KONUM</div>
+          <div class="contact-info-value" style="color:var(--text)">Türkiye — Remote çalışıyoruz 🌍</div>
+        </div>
+        <div class="contact-info-block">
+          <div class="contact-info-label">YANIT SÜRESİ</div>
+          <div class="contact-info-value" style="color:var(--text)">24 saat içinde dönüş garantisi</div>
+        </div>
+        <div style="margin-top:2rem;padding:1.5rem;background:var(--surface);border-radius:12px;border:0.5px solid var(--border)">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:0.8rem">// sosyal medya</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <a href="#" style="font-family:var(--mono);font-size:12px;color:var(--accent)">→ github.com/kodlayankafalar</a>
+            <a href="#" style="font-family:var(--mono);font-size:12px;color:var(--accent)">→ linkedin.com/in/kodlayankafalar</a>
+            <a href="#" style="font-family:var(--mono);font-size:12px;color:var(--accent)">→ twitter.com/kodlayankafalar</a>
+          </div>
+        </div>
+      </div>
+      <div class="contact-form">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:1.5rem;letter-spacing:1px">// PROJE FORMU</div>
+        <div class="form-group">
+          <label class="form-label">AD SOYAD</label>
+          <input class="form-input" type="text" placeholder="Adınız Soyadınız">
+        </div>
+        <div class="form-group">
+          <label class="form-label">E-POSTA</label>
+          <input class="form-input" type="email" placeholder="ornek@mail.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">HİZMET TÜRÜ</label>
+          <select class="form-input">
+            <option>Web Uygulama Geliştirme</option>
+            <option>Mobil Uygulama</option>
+            <option>SaaS Geliştirme</option>
+            <option>API Entegrasyon</option>
+            <option>Danışmanlık</option>
+            <option>Diğer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">PROJE DETAYI</label>
+          <textarea class="form-input form-textarea" placeholder="Projenizi kısaca anlatın..."></textarea>
+        </div>
+        <button class="form-submit" onclick="showToast('Mesajınız alındı! 24 saat içinde dönüş yapacağım.')">Gönder →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer id="mainFooter">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="nav-logo"><div class="nav-logo-icon">&lt;/&gt;</div><div class="nav-logo-text">kodlayan<span style="color:var(--accent)">kafalar</span></div></div>
+      <p>Yazılım çözümleri üreten bir bilgisayar mühendisinin dijital atölyesi.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Hizmetler</h4>
+      <a href="#" onclick="showPage('hizmetler')">Web Geliştirme</a>
+      <a href="#" onclick="showPage('hizmetler')">Mobil Uygulama</a>
+      <a href="#" onclick="showPage('hizmetler')">SaaS Geliştirme</a>
+      <a href="#" onclick="showPage('hizmetler')">API Entegrasyonu</a>
+    </div>
+    <div class="footer-col">
+      <h4>Şirket</h4>
+      <a href="#" onclick="showPage('hakkimda')">Hakkımda</a>
+      <a href="#" onclick="showPage('projeler')">Projeler</a>
+      <a href="#" onclick="showPage('blog')">Blog</a>
+      <a href="#" onclick="showPage('iletisim')">İletişim</a>
+    </div>
+    <div class="footer-col">
+      <h4>Sosyal</h4>
+      <a href="#">GitHub</a><a href="#">LinkedIn</a><a href="#">Twitter</a><a href="#">YouTube</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 kodlayankafalar.com — Tüm hakları saklıdır.</span>
+    <span style="cursor:pointer;color:var(--muted2)" onclick="openAdmin()">⚙ Admin</span>
+  </div>
+</footer>
+
+<!-- ===== ADMIN LOGIN ===== -->
+<div id="adminLogin" class="open">
+  <!-- wait for js to hide it -->
+  <div class="login-box">
+    <h2>Admin Girişi</h2>
+    <p>// kodlayan kafalar yönetim paneli</p>
+    <div class="form-group">
+      <label class="form-label">KULLANICI ADI</label>
+      <input class="form-input" type="text" id="loginUser" placeholder="admin">
+    </div>
+    <div class="form-group">
+      <label class="form-label">ŞİFRE</label>
+      <input class="form-input" type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="form-submit" onclick="doLogin()">Giriş Yap →</button>
+    <div class="login-err" id="loginErr">Hatalı kullanıcı adı veya şifre.</div>
+    <div style="margin-top:1rem;text-align:center"><button style="background:none;border:none;font-family:var(--mono);font-size:11px;color:var(--muted);cursor:pointer" onclick="closeAdmin()">← Siteye Dön</button></div>
+  </div>
+</div>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div id="adminPanel">
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+      <div class="admin-logo">
+        <div class="admin-logo-icon">&lt;/&gt;</div>
+        <div class="admin-logo-text">kodlayan<span>kafalar</span><br><span style="font-size:10px;color:var(--muted);font-weight:400">admin panel</span></div>
+      </div>
+      <nav class="admin-nav">
+        <div class="admin-nav-item active" onclick="switchAdmin('dashboard')"><span class="admin-nav-icon">⬛</span> Dashboard</div>
+        <div class="admin-nav-item" onclick="switchAdmin('projeler')"><span class="admin-nav-icon">📁</span> Projeler</div>
+        <div class="admin-nav-item" onclick="switchAdmin('videolar')"><span class="admin-nav-icon">▶</span> Videolar</div>
+        <div class="admin-nav-item" onclick="switchAdmin('blog')"><span class="admin-nav-icon">📝</span> Blog Yazıları</div>
+        <div class="admin-nav-item" onclick="switchAdmin('hizmetler')"><span class="admin-nav-icon">⚡</span> Hizmetler</div>
+        <div class="admin-nav-item" onclick="switchAdmin('ayarlar')"><span class="admin-nav-icon">⚙</span> Site Ayarları</div>
+      </nav>
+      <div class="admin-logout">
+        <button onclick="closeAdmin()">Çıkış Yap</button>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <div class="admin-topbar h2" id="adminTitle" style="font-size:16px;font-weight:700">Dashboard</div>
+          <div class="admin-topbar-sub">Hoş geldiniz, Admin</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--muted)" id="adminDate"></div>
+      </div>
+      <div class="admin-content">
+
+        <!-- DASHBOARD -->
+        <div class="admin-section active" id="as-dashboard">
+          <div class="dash-grid">
+            <div class="dash-card"><div class="dash-card-label">TOPLAM PROJE</div><div class="dash-card-num green" id="dc-proje">0</div></div>
+            <div class="dash-card"><div class="dash-card-label">VİDEO</div><div class="dash-card-num purple" id="dc-video">0</div></div>
+            <div class="dash-card"><div class="dash-card-label">BLOG YAZISI</div><div class="dash-card-num amber" id="dc-blog">0</div></div>
+            <div class="dash-card"><div class="dash-card-label">HİZMET</div><div class="dash-card-num red" id="dc-hizmet">0</div></div>
+          </div>
+          <div class="admin-table-wrap">
+            <div class="admin-table-header"><h3>Son Aktivite</h3></div>
+            <table>
+              <thead><tr><th>İÇERİK</th><th>TİP</th><th>TARİH</th><th>DURUM</th></tr></thead>
+              <tbody id="activityTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PROJELER -->
+        <div class="admin-section" id="as-projeler">
+          <div class="admin-table-wrap">
+            <div class="admin-table-header">
+              <h3>Projeler</h3>
+              <button class="btn-add" onclick="openModal('project')">+ Proje Ekle</button>
+            </div>
+            <table>
+              <thead><tr><th>BAŞLIK</th><th>KATEGORİ</th><th>DURUM</th><th>İŞLEMLER</th></tr></thead>
+              <tbody id="projectsTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VİDEOLAR -->
+        <div class="admin-section" id="as-videolar">
+          <div class="admin-table-wrap">
+            <div class="admin-table-header">
+              <h3>Videolar</h3>
+              <button class="btn-add" onclick="openModal('video')">+ Video Ekle</button>
+            </div>
+            <table>
+              <thead><tr><th>BAŞLIK</th><th>YOUTUBE ID</th><th>TARİH</th><th>İŞLEMLER</th></tr></thead>
+              <tbody id="videosTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- BLOG -->
+        <div class="admin-section" id="as-blog">
+          <div class="admin-table-wrap">
+            <div class="admin-table-header">
+              <h3>Blog Yazıları</h3>
+              <button class="btn-add" onclick="openModal('blog')">+ Yazı Ekle</button>
+            </div>
+            <table>
+              <thead><tr><th>BAŞLIK</th><th>TARİH</th><th>DURUM</th><th>İŞLEMLER</th></tr></thead>
+              <tbody id="blogTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- HİZMETLER -->
+        <div class="admin-section" id="as-hizmetler">
+          <div class="admin-table-wrap">
+            <div class="admin-table-header">
+              <h3>Hizmetler</h3>
+              <button class="btn-add" onclick="openModal('service')">+ Hizmet Ekle</button>
+            </div>
+            <table>
+              <thead><tr><th>HİZMET ADI</th><th>AÇIKLAMA</th><th>İŞLEMLER</th></tr></thead>
+              <tbody id="servicesTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- AYARLAR -->
+        <div class="admin-section" id="as-ayarlar">
+          <div class="settings-grid">
+            <div class="settings-card">
+              <div class="settings-card-head">Genel Bilgiler</div>
+              <div class="settings-card-body">
+                <div class="form-group"><label class="form-label">SİTE BAŞLIĞI</label><input class="form-input" value="Kodlayan Kafalar"></div>
+                <div class="form-group"><label class="form-label">SLOGAN</label><input class="form-input" value="Kod yazarız, çözüm üretiriz, büyürsünüz."></div>
+                <div class="form-group"><label class="form-label">E-POSTA</label><input class="form-input" value="merhaba@kodlayankafalar.com"></div>
+                <button class="btn-save" onclick="showToast('Ayarlar kaydedildi!')">Kaydet</button>
+              </div>
+            </div>
+            <div class="settings-card">
+              <div class="settings-card-head">İstatistikler</div>
+              <div class="settings-card-body">
+                <div class="form-group"><label class="form-label">PROJE SAYISI (ANA SAYFA)</label><input class="form-input" type="number" id="statProjeSay" value="24"></div>
+                <div class="form-group"><label class="form-label">MÜŞTERİ SAYISI</label><input class="form-input" type="number" id="statMusteriSay" value="18"></div>
+                <div class="form-group"><label class="form-label">YIL DENEYİM</label><input class="form-input" type="number" id="statYilSay" value="4"></div>
+                <button class="btn-save" onclick="saveStats()">Kaydet</button>
+              </div>
+            </div>
+            <div class="settings-card">
+              <div class="settings-card-head">Özellikler</div>
+              <div class="settings-card-body">
+                <div class="settings-row">
+                  <div><div class="settings-row-label">Blog Aktif</div><div class="settings-row-sub">Blog sayfasını göster/gizle</div></div>
+                  <label class="toggle"><input type="checkbox" checked><div class="toggle-slider"></div></label>
+                </div>
+                <div class="settings-row">
+                  <div><div class="settings-row-label">İletişim Formu</div><div class="settings-row-sub">İletişim formunu aktifleştir</div></div>
+                  <label class="toggle"><input type="checkbox" checked><div class="toggle-slider"></div></label>
+                </div>
+                <div class="settings-row">
+                  <div><div class="settings-row-label">Proje Sayfası</div><div class="settings-row-sub">Portföy sayfasını göster</div></div>
+                  <label class="toggle"><input type="checkbox" checked><div class="toggle-slider"></div></label>
+                </div>
+              </div>
+            </div>
+            <div class="settings-card">
+              <div class="settings-card-head">Şifre Değiştir</div>
+              <div class="settings-card-body">
+                <div class="form-group"><label class="form-label">YENİ ŞİFRE</label><input class="form-input" type="password" placeholder="••••••••"></div>
+                <div class="form-group"><label class="form-label">TEKRAR</label><input class="form-input" type="password" placeholder="••••••••"></div>
+                <button class="btn-save" onclick="showToast('Şifre güncellendi!')">Güncelle</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<!-- Project Modal -->
+<div class="modal-overlay" id="modal-project">
+  <div class="modal">
+    <div class="modal-head"><h3 id="projModalTitle">Proje Ekle</h3><button class="modal-close" onclick="closeModal('project')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="projEditId">
+      <div class="form-group"><label class="form-label">PROJE ADI</label><input class="form-input" id="projTitle" placeholder="Proje adı"></div>
+      <div class="form-group"><label class="form-label">KATEGORİ</label>
+        <select class="form-input" id="projCategory">
+          <option>Web Uygulama</option><option>Mobil Uygulama</option><option>SaaS</option><option>API</option><option>Otomasyon</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">AÇIKLAMA</label><textarea class="form-input form-textarea" id="projDesc" placeholder="Proje açıklaması..."></textarea></div>
+      <div class="form-group"><label class="form-label">ETİKETLER (virgülle ayır)</label><input class="form-input" id="projTags" placeholder="React, Node.js, AWS"></div>
+      <div class="form-group"><label class="form-label">DURUM</label>
+        <select class="form-input" id="projStatus"><option value="yayinda">Yayında</option><option value="devam">Devam Ediyor</option></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('project')">İptal</button>
+      <button class="btn-save" onclick="saveProject()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Video Modal -->
+<div class="modal-overlay" id="modal-video">
+  <div class="modal">
+    <div class="modal-head"><h3 id="vidModalTitle">Video Ekle</h3><button class="modal-close" onclick="closeModal('video')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="vidEditId">
+      <div class="form-group"><label class="form-label">VİDEO BAŞLIĞI</label><input class="form-input" id="vidTitle" placeholder="Video başlığı"></div>
+      <div class="form-group"><label class="form-label">YOUTUBE VİDEO ID</label><input class="form-input" id="vidYtId" placeholder="dQw4w9WgXcQ (URL'deki v= kısmı)"></div>
+      <div class="form-group"><label class="form-label">AÇIKLAMA</label><textarea class="form-input form-textarea" id="vidDesc" placeholder="Video hakkında kısa açıklama..."></textarea></div>
+      <div class="form-group"><label class="form-label">TARİH</label><input class="form-input" type="date" id="vidDate"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('video')">İptal</button>
+      <button class="btn-save" onclick="saveVideo()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Blog Modal -->
+<div class="modal-overlay" id="modal-blog">
+  <div class="modal">
+    <div class="modal-head"><h3 id="blogModalTitle">Blog Yazısı Ekle</h3><button class="modal-close" onclick="closeModal('blog')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="blogEditId">
+      <div class="form-group"><label class="form-label">BAŞLIK</label><input class="form-input" id="blogTitle" placeholder="Yazı başlığı"></div>
+      <div class="form-group"><label class="form-label">ÖZET</label><textarea class="form-input form-textarea" id="blogExcerpt" placeholder="Kısa özet..."></textarea></div>
+      <div class="form-group"><label class="form-label">İÇERİK</label><textarea class="form-input" style="min-height:150px;resize:vertical" id="blogContent" placeholder="Yazı içeriği..."></textarea></div>
+      <div class="form-group"><label class="form-label">TARİH</label><input class="form-input" type="date" id="blogDate"></div>
+      <div class="form-group"><label class="form-label">DURUM</label>
+        <select class="form-input" id="blogStatus"><option value="yayinda">Yayında</option><option value="taslak">Taslak</option></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('blog')">İptal</button>
+      <button class="btn-save" onclick="saveBlog()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Service Modal -->
+<div class="modal-overlay" id="modal-service">
+  <div class="modal">
+    <div class="modal-head"><h3>Hizmet Ekle</h3><button class="modal-close" onclick="closeModal('service')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="srvEditId">
+      <div class="form-group"><label class="form-label">HİZMET ADI</label><input class="form-input" id="srvTitle" placeholder="Hizmet adı"></div>
+      <div class="form-group"><label class="form-label">AÇIKLAMA</label><textarea class="form-input form-textarea" id="srvDesc" placeholder="Hizmet açıklaması..."></textarea></div>
+      <div class="form-group"><label class="form-label">ETİKETLER (virgülle ayır)</label><input class="form-input" id="srvTags" placeholder="React, Node.js"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('service')">İptal</button>
+      <button class="btn-save" onclick="saveService()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+let data = {
+  projects: [
+    {id:1, title:'E-Ticaret Platformu', category:'Web Uygulama', desc:'Modern alışveriş deneyimi sunan full-stack e-ticaret sitesi.', tags:['React','Node.js','Stripe'], status:'yayinda'},
+    {id:2, title:'Stok Takip SaaS', category:'SaaS', desc:'KOBİler için gerçek zamanlı stok ve sipariş yönetim sistemi.', tags:['Vue','Python','PostgreSQL'], status:'yayinda'},
+    {id:3, title:'Mobil Muhasebe', category:'Mobil Uygulama', desc:'Serbest çalışanlar için iOS & Android muhasebe uygulaması.', tags:['React Native','Firebase'], status:'devam'},
+  ],
+  videos: [
+    {id:1, title:'React\'te State Yönetimi', ytId:'dQw4w9WgXcQ', desc:'useState, useReducer ve Context API karşılaştırması.', date:'2025-03-15'},
+    {id:2, title:'Node.js ile REST API', ytId:'dQw4w9WgXcQ', desc:'Express.js ile sıfırdan REST API geliştirme rehberi.', date:'2025-02-28'},
+  ],
+  blog: [
+    {id:1, title:'Freelance Yazılım Geliştirmenin 5 Altın Kuralı', excerpt:'Yıllarca öğrendiklerimi özetliyorum: müşteri iletişimi, proje yönetimi ve sağlıklı çalışma alışkanlıkları.', content:'', date:'2025-04-01', status:'yayinda'},
+    {id:2, title:'2025\'te Öğrenmeye Değer 3 Teknoloji', excerpt:'Piyasa talebi ve geleceğe yönelik değerlendirme: Rust, WebAssembly ve Edge Computing.', content:'', date:'2025-03-10', status:'yayinda'},
+    {id:3, title:'SaaS Ürün Nasıl Fiyatlandırılır?', excerpt:'Fiyatlandırma stratejileri, freemium tuzağı ve değer bazlı fiyatlandırma üzerine düşünceler.', content:'', date:'2025-02-20', status:'taslak'},
+  ],
+  services: [
+    {id:1, title:'Full-Stack Web Geliştirme', desc:'React, Next.js ile modern frontend; Node.js ile güçlü backend.', tags:['React','Node.js','PostgreSQL']},
+    {id:2, title:'Mobil Uygulama', desc:'React Native ile iOS & Android cross-platform geliştirme.', tags:['React Native','Flutter']},
+    {id:3, title:'API Entegrasyonu', desc:'Sistemlerinizi birbirine bağlayan RESTful API çözümleri.', tags:['REST','GraphQL']},
+  ],
+  stats: {projeler: 24, musteriler: 18, yil: 4}
+};
+
+let nextId = {project:10, video:10, blog:10, service:10};
+
+// ===== NAVIGATION =====
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  const pg = document.getElementById('page-'+id);
+  if(pg) pg.classList.add('active');
+  const navEl = document.getElementById('nav-'+id);
+  if(navEl) navEl.classList.add('active');
+  window.scrollTo(0,0);
+  renderPublic();
+}
+
+// ===== RENDER PUBLIC =====
+function renderPublic() {
+  renderHomeProjects();
+  renderProjectsPage();
+  renderVideosPage();
+  renderBlogPage();
+  animateStats();
+}
+
+function renderHomeProjects() {
+  const c = document.getElementById('homeProjects');
+  if(!c) return;
+  const items = data.projects.slice(0,3);
+  c.innerHTML = items.map(p => projectCardHTML(p)).join('');
+}
+
+function renderProjectsPage() {
+  const c = document.getElementById('projectsGrid');
+  if(!c) return;
+  c.innerHTML = data.projects.map(p => projectCardHTML(p)).join('');
+}
+
+function projectCardHTML(p) {
+  const icons = {'Web Uygulama':'🌐','SaaS':'⚡','Mobil Uygulama':'📱','API':'🔗','Otomasyon':'🤖'};
+  return `<div class="project-card">
+    <div class="project-thumb"><div class="project-thumb-bg"><div class="project-thumb-icon">${icons[p.category]||'💻'}</div></div></div>
+    <div class="project-body">
+      <div class="project-category">${p.category}</div>
+      <div class="project-title">${p.title}</div>
+      <div class="project-desc">${p.desc}</div>
+    </div>
+    <div class="project-footer">${p.tags.map(t=>`<span class="project-tag">${t}</span>`).join('')}</div>
+  </div>`;
+}
+
+function renderVideosPage() {
+  const c = document.getElementById('videosGrid');
+  if(!c) return;
+  c.innerHTML = data.videos.map(v => `
+    <div class="video-card">
+      <div class="video-thumb" onclick="playVideo(this,'${v.ytId}')">
+        <div class="video-thumb-cover" id="cover-${v.id}">
+          <img src="https://img.youtube.com/vi/${v.ytId}/mqdefault.jpg" alt="${v.title}" onerror="this.style.display='none'" style="width:100%;height:100%;object-fit:cover">
+        </div>
+        <div class="vplay-btn">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M6 4l9 5-9 5V4z" fill="#08080e"/></svg>
+        </div>
+        <iframe id="yt-${v.id}" src="" allow="autoplay" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;display:none"></iframe>
+      </div>
+      <div class="video-body">
+        <div class="video-title">${v.title}</div>
+        <div class="video-meta">${v.date} · ${v.desc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function playVideo(el, ytId) {
+  const cover = el.querySelector('.video-thumb-cover');
+  const iframe = el.querySelector('iframe');
+  const btn = el.querySelector('.vplay-btn');
+  cover.style.display='none'; btn.style.display='none';
+  iframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1`;
+  iframe.style.display='block';
+}
+
+function renderBlogPage() {
+  const c = document.getElementById('blogGrid');
+  if(!c) return;
+  c.innerHTML = data.blog.filter(b=>b.status==='yayinda').map(b => `
+    <div class="blog-card">
+      <div class="blog-date">${b.date}</div>
+      <div class="blog-title">${b.title}</div>
+      <div class="blog-excerpt">${b.excerpt}</div>
+      <div class="blog-read">Devamını Oku →</div>
+    </div>
+  `).join('');
+}
+
+// ===== STATS ANIMATION =====
+function animateStats() {
+  animNum('statP', data.stats.projeler);
+  animNum('statC', data.stats.musteriler);
+  animNum('statY', data.stats.yil);
+}
+function animNum(id, target) {
+  const el = document.getElementById(id); if(!el) return;
+  let cur=0; const step=Math.ceil(target/30);
+  const t = setInterval(()=>{cur=Math.min(cur+step,target);el.textContent=cur+(target>10?'+':'');if(cur>=target)clearInterval(t)},40);
+}
+
+// ===== ADMIN =====
+function openAdmin() {
+  document.getElementById('adminLogin').classList.add('open');
+}
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value;
+  const p = document.getElementById('loginPass').value;
+  if(u==='admin' && p==='admin123') {
+    document.getElementById('adminLogin').classList.remove('open');
+    document.getElementById('adminPanel').style.display='block';
+    document.getElementById('adminDate').textContent = new Date().toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+    renderAdmin();
+  } else {
+    document.getElementById('loginErr').style.display='block';
+  }
+}
+
+function closeAdmin() {
+  document.getElementById('adminPanel').style.display='none';
+  document.getElementById('adminLogin').classList.remove('open');
+}
+
+function switchAdmin(s) {
+  document.querySelectorAll('.admin-nav-item').forEach(i=>i.classList.remove('active'));
+  document.querySelectorAll('.admin-section').forEach(i=>i.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('as-'+s).classList.add('active');
+  document.getElementById('adminTitle').textContent = {dashboard:'Dashboard',projeler:'Projeler',videolar:'Videolar',blog:'Blog Yazıları',hizmetler:'Hizmetler',ayarlar:'Site Ayarları'}[s];
+  renderAdmin();
+}
+
+function renderAdmin() {
+  // dash
+  document.getElementById('dc-proje').textContent = data.projects.length;
+  document.getElementById('dc-video').textContent = data.videos.length;
+  document.getElementById('dc-blog').textContent = data.blog.length;
+  document.getElementById('dc-hizmet').textContent = data.services.length;
+  // activity
+  const acts = [...data.projects.slice(-2).map(p=>({t:p.title,type:'Proje',date:'Bugün',st:'yayinda'})), ...data.blog.slice(-2).map(b=>({t:b.title,type:'Blog',date:b.date,st:b.status}))];
+  document.getElementById('activityTable').innerHTML = acts.map(a=>`<tr><td>${a.t}</td><td>${a.type}</td><td>${a.date}</td><td><span class="badge ${a.st==='yayinda'?'badge-green':'badge-amber'}">${a.st}</span></td></tr>`).join('');
+  // projects table
+  document.getElementById('projectsTable').innerHTML = data.projects.map(p=>`<tr><td><b>${p.title}</b></td><td>${p.category}</td><td><span class="badge ${p.status==='yayinda'?'badge-green':'badge-amber'}">${p.status}</span></td><td><div class="td-actions"><button class="btn-edit" onclick="editProject(${p.id})">Düzenle</button><button class="btn-del" onclick="deleteItem('project',${p.id})">Sil</button></div></td></tr>`).join('');
+  // videos table
+  document.getElementById('videosTable').innerHTML = data.videos.map(v=>`<tr><td><b>${v.title}</b></td><td><span class="badge badge-green">${v.ytId}</span></td><td>${v.date}</td><td><div class="td-actions"><button class="btn-edit" onclick="editVideo(${v.id})">Düzenle</button><button class="btn-del" onclick="deleteItem('video',${v.id})">Sil</button></div></td></tr>`).join('');
+  // blog table
+  document.getElementById('blogTable').innerHTML = data.blog.map(b=>`<tr><td><b>${b.title}</b></td><td>${b.date}</td><td><span class="badge ${b.status==='yayinda'?'badge-green':'badge-amber'}">${b.status}</span></td><td><div class="td-actions"><button class="btn-edit" onclick="editBlog(${b.id})">Düzenle</button><button class="btn-del" onclick="deleteItem('blog',${b.id})">Sil</button></div></td></tr>`).join('');
+  // services table
+  document.getElementById('servicesTable').innerHTML = data.services.map(s=>`<tr><td><b>${s.title}</b></td><td style="font-family:var(--mono);font-size:12px;color:var(--muted)">${s.desc.substring(0,60)}...</td><td><div class="td-actions"><button class="btn-edit" onclick="editService(${s.id})">Düzenle</button><button class="btn-del" onclick="deleteItem('service',${s.id})">Sil</button></div></td></tr>`).join('');
+}
+
+// ===== MODAL =====
+function openModal(type) {
+  document.getElementById('modal-'+type).classList.add('open');
+  if(type==='video'){const d=new Date();document.getElementById('vidDate').value=d.toISOString().split('T')[0]}
+  if(type==='blog'){const d=new Date();document.getElementById('blogDate').value=d.toISOString().split('T')[0]}
+}
+function closeModal(type) { document.getElementById('modal-'+type).classList.remove('open'); clearModal(type); }
+function clearModal(type) {
+  if(type==='project'){['projEditId','projTitle','projDesc','projTags'].forEach(i=>document.getElementById(i).value=''); document.getElementById('projModalTitle').textContent='Proje Ekle';}
+  if(type==='video'){['vidEditId','vidTitle','vidYtId','vidDesc','vidDate'].forEach(i=>document.getElementById(i).value=''); document.getElementById('vidModalTitle').textContent='Video Ekle';}
+  if(type==='blog'){['blogEditId','blogTitle','blogExcerpt','blogContent','blogDate'].forEach(i=>document.getElementById(i).value=''); document.getElementById('blogModalTitle').textContent='Blog Yazısı Ekle';}
+  if(type==='service'){['srvEditId','srvTitle','srvDesc','srvTags'].forEach(i=>document.getElementById(i).value='');}
+}
+
+// ===== CRUD: PROJECT =====
+function saveProject() {
+  const id = document.getElementById('projEditId').value;
+  const obj = {
+    id: id ? parseInt(id) : nextId.project++,
+    title: document.getElementById('projTitle').value,
+    category: document.getElementById('projCategory').value,
+    desc: document.getElementById('projDesc').value,
+    tags: document.getElementById('projTags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    status: document.getElementById('projStatus').value
+  };
+  if(!obj.title){showToast('Proje adı gerekli!','error');return;}
+  if(id) data.projects = data.projects.map(p=>p.id===obj.id?obj:p);
+  else data.projects.push(obj);
+  closeModal('project'); renderAdmin(); renderPublic();
+  showToast(id?'Proje güncellendi!':'Proje eklendi!');
+}
+function editProject(id) {
+  const p = data.projects.find(x=>x.id===id); if(!p)return;
+  document.getElementById('projEditId').value=p.id;
+  document.getElementById('projTitle').value=p.title;
+  document.getElementById('projCategory').value=p.category;
+  document.getElementById('projDesc').value=p.desc;
+  document.getElementById('projTags').value=p.tags.join(', ');
+  document.getElementById('projStatus').value=p.status;
+  document.getElementById('projModalTitle').textContent='Proje Düzenle';
+  openModal('project');
+}
+
+// ===== CRUD: VIDEO =====
+function saveVideo() {
+  const id = document.getElementById('vidEditId').value;
+  const obj = {
+    id: id ? parseInt(id) : nextId.video++,
+    title: document.getElementById('vidTitle').value,
+    ytId: document.getElementById('vidYtId').value,
+    desc: document.getElementById('vidDesc').value,
+    date: document.getElementById('vidDate').value
+  };
+  if(!obj.title||!obj.ytId){showToast('Başlık ve YouTube ID gerekli!','error');return;}
+  if(id) data.videos = data.videos.map(v=>v.id===obj.id?obj:v);
+  else data.videos.push(obj);
+  closeModal('video'); renderAdmin(); renderVideosPage();
+  showToast(id?'Video güncellendi!':'Video eklendi!');
+}
+function editVideo(id) {
+  const v = data.videos.find(x=>x.id===id); if(!v)return;
+  document.getElementById('vidEditId').value=v.id;
+  document.getElementById('vidTitle').value=v.title;
+  document.getElementById('vidYtId').value=v.ytId;
+  document.getElementById('vidDesc').value=v.desc;
+  document.getElementById('vidDate').value=v.date;
+  document.getElementById('vidModalTitle').textContent='Video Düzenle';
+  openModal('video');
+}
+
+// ===== CRUD: BLOG =====
+function saveBlog() {
+  const id = document.getElementById('blogEditId').value;
+  const obj = {
+    id: id ? parseInt(id) : nextId.blog++,
+    title: document.getElementById('blogTitle').value,
+    excerpt: document.getElementById('blogExcerpt').value,
+    content: document.getElementById('blogContent').value,
+    date: document.getElementById('blogDate').value,
+    status: document.getElementById('blogStatus').value
+  };
+  if(!obj.title){showToast('Başlık gerekli!','error');return;}
+  if(id) data.blog = data.blog.map(b=>b.id===obj.id?obj:b);
+  else data.blog.push(obj);
+  closeModal('blog'); renderAdmin(); renderBlogPage();
+  showToast(id?'Yazı güncellendi!':'Yazı eklendi!');
+}
+function editBlog(id) {
+  const b = data.blog.find(x=>x.id===id); if(!b)return;
+  document.getElementById('blogEditId').value=b.id;
+  document.getElementById('blogTitle').value=b.title;
+  document.getElementById('blogExcerpt').value=b.excerpt;
+  document.getElementById('blogContent').value=b.content;
+  document.getElementById('blogDate').value=b.date;
+  document.getElementById('blogStatus').value=b.status;
+  document.getElementById('blogModalTitle').textContent='Blog Yazısı Düzenle';
+  openModal('blog');
+}
+
+// ===== CRUD: SERVICE =====
+function saveService() {
+  const id = document.getElementById('srvEditId').value;
+  const obj = {
+    id: id ? parseInt(id) : nextId.service++,
+    title: document.getElementById('srvTitle').value,
+    desc: document.getElementById('srvDesc').value,
+    tags: document.getElementById('srvTags').value.split(',').map(t=>t.trim()).filter(Boolean)
+  };
+  if(!obj.title){showToast('Hizmet adı gerekli!','error');return;}
+  if(id) data.services = data.services.map(s=>s.id===obj.id?obj:s);
+  else data.services.push(obj);
+  closeModal('service'); renderAdmin();
+  showToast(id?'Hizmet güncellendi!':'Hizmet eklendi!');
+}
+function editService(id) {
+  const s = data.services.find(x=>x.id===id); if(!s)return;
+  document.getElementById('srvEditId').value=s.id;
+  document.getElementById('srvTitle').value=s.title;
+  document.getElementById('srvDesc').value=s.desc;
+  document.getElementById('srvTags').value=s.tags.join(', ');
+  openModal('service');
+}
+
+// ===== DELETE =====
+function deleteItem(type, id) {
+  if(!confirm('Silmek istediğinize emin misiniz?')) return;
+  if(type==='project') data.projects = data.projects.filter(x=>x.id!==id);
+  if(type==='video') data.videos = data.videos.filter(x=>x.id!==id);
+  if(type==='blog') data.blog = data.blog.filter(x=>x.id!==id);
+  if(type==='service') data.services = data.services.filter(x=>x.id!==id);
+  renderAdmin(); renderPublic();
+  showToast('Silindi!');
+}
+
+// ===== STATS SAVE =====
+function saveStats() {
+  data.stats.projeler = parseInt(document.getElementById('statProjeSay').value)||0;
+  data.stats.musteriler = parseInt(document.getElementById('statMusteriSay').value)||0;
+  data.stats.yil = parseInt(document.getElementById('statYilSay').value)||0;
+  animateStats();
+  showToast('İstatistikler kaydedildi!');
+}
+
+// ===== TOAST =====
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast'+(type?' '+type:'');
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ===== INIT =====
+document.getElementById('adminLogin').classList.remove('open');
+renderPublic();
+</script>
+</body>
+</html>
